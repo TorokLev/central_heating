@@ -1,7 +1,7 @@
 import paramiko
 
 hostname = '192.168.1.101'
-password = 'raspberry'
+password = '*****'
 username = "pi"
 port = 22
 

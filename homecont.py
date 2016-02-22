@@ -11,6 +11,20 @@ RoomTemp = TempSensor('28-0214638225ff')
 BedRTemp = TempSensor('28-021463eaa0ff', True)
 LivingRTemp = TempSensor('28-02146384abff',True)
 
+try:
+
+  f = open('/home/pi/28-02146384abff_mv.txt','rt')
+  LRm = f.read()
+  f.close()
+
+  f = open('/home/pi/28-021463eaa0ff_mv.txt','rt')
+  BRm = f.read()
+  f.close()
+
+except:
+  pass
+
+
 HeatCont = Output(21)
 WaterCont = Output2v(22,23)
 NoOp = Output(24)
@@ -32,20 +46,42 @@ Water = \
 [
 [wt,[5,6],[0 ,24],[40.0,40.7]],
 [wt,[]   ,[5 , 8],[40.0,40.7]],
-[wt,[]   ,[18,22],[40.0,40.7]]
+[wt,[]   ,[18,22],[40.0,40.7]],
+[wt,[]   ,[     ],[40.0,40.7]]
 ]
 
-Heating = \
+nHeating = \
 [
-[br,[   ],[23,    5],[19.0,19.5]],
-[br,[5,6],[5 ,    7],[19.0,10.0]],
-[lr,[5,6],[7 ,   21],[21.0,21.2]],
-[br,[]   ,[ 5.30, 7],[22.0,22.2]],
+[br,[   ],[23,    5],[18.5,19.0]],
+[br,[5,6],[5 ,    6],[19.0,19.5]],
+[lr,[5,6],[6 ,   21],[21.5,21.7]],
+[br,[]   ,[5.30,  7],[21.0,21.2]],
 [lr,[]   ,[18,   21],[21.0,21.2]],
 [br,[]   ,[21,   23],[21.0,21.2]],
-[lr,[]   ,[18,   24],[21.0,21.2]],
+[lr,[]   ,[18,   24],[21.5,21.7]],
 [lr,[]   ,[        ],[20.0,20.2]]
 ]
+
+xHeating = \
+[
+[lr,[]   ,[        ],[14.0,14.5]]
+]
+
+
+mHeating = \
+[
+[br,[],[23,    5],[18.5,19.0]],
+[br,[],[5 ,    6],[19.0,19.5]],
+[lr,[],[6 ,   21],[22.0,22.2]],
+[br,[],[21,   23],[21.0,21.2]],
+[lr,[],[18,   24],[21.5,21.7]],
+[lr,[],[        ],[20.0,20.2]]
+]
+
+if int(BRm)+int(LRm) > 0:
+  Heating = mHeating
+else:
+  Heating = nHeating
 
 log = now.isoformat()+','
 
@@ -92,6 +128,8 @@ check(Water,WaterCont,'W')
 
 print 'Heating Check', br.temp() 
 check(Heating,HeatCont,'H')
+
+log += 'LRM:%s,BRM:%s' % (LRm,BRm)
 
 f = open('/home/pi/contlog.log','a+t')
 f.write(log+'\n')
